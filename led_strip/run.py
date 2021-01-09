@@ -8,29 +8,39 @@ import math
 import threading
 import time
 import copy
+from flask import Flask, request, render_template, redirect, url_for
 
 # Import LED driver.
 from rpi_ws281x import PixelStrip, Color
 
 
 class Control(object):
+    """
+    Object to store selected state of the strip.
+    """
 
     def __init__(self):
-        self.mode = None
-        self.color = None
-        self.frequency = None
+        """
+        Setup default values.
+        """
+        self.mode = 'off'
+        self.last_mode = 'off'
+        self.color = [255, 255, 255]
+        self.frequency = 1.0
+        self.brightness = 1.0
 
-    def set_state(self):
-        mode = input('mode: ')
-        r = int(input('red: '))
-        g = int(input('green: '))
-        b = int(input('blue: '))
-        frequency = 1.0 / float(input('period: '))
-        with lock:
-            self.mode = mode
-            self.color = [r, g, b]
-            self.frequency = frequency
-            input('set state')
+    def get_color_hex(self):
+        """
+        Return the color as a hex string.
+        """
+        return '#%02x%02x%02x' % tuple(val for val in self.color)
+
+    def set_color_hex(self, hex_value):
+        """
+        Set the color from a hex string.
+        """
+        h = hex_value.lstrip('#')
+        self.color = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
 
 
 def strip_off():
@@ -77,7 +87,7 @@ def strip_color_pulse():
             if not lock.locked():
                 with lock:
                     control_data = copy.deepcopy(data)
-                if not control_data.mode == 'pulse':
+                if not control_data.mode == 'single_color_pulse':
                     return
 
             factor = 0.5 * (-math.cos(j / n_frames * 2 * math.pi) + 1.0)
@@ -129,46 +139,79 @@ def strip_rainbow():
             time.sleep(1.0 / control_data.frequency / 256)
 
 
-if __name__ == "__main__":
+# Setup flask.
+app = Flask(__name__)
 
+
+@app.route('/mode/<name>', methods=['POST'])
+def set_mode(name):
+
+    global kernel
+
+    with lock:
+        # Lock the global data and set the new values.
+        data.frequency = 1.0 / float(request.form['period'])
+        data.set_color_hex(request.form['color'])
+        data.brightness = float(request.form['brightness']) / 10.0
+        data.mode = name
+
+    if data.last_mode == data.mode and kernel.is_alive():
+        # The mode did not change, keep the mode running. Changed options
+        # like color or frequency are handled inside the kernel. This branch
+        # is only executed if the thread is still running. Otherwise it will be
+        # started again.
+        pass
+    else:
+        # The mode changed, wait for the kernel to finish.
+        data.last_mode = data.mode
+        kernel.join()
+
+        # Start the new kernel, depending on which function is selected.
+        if data.mode == 'off':
+            kernel = threading.Thread(target=strip_off, daemon=True)
+            kernel.start()
+        elif data.mode == 'single_color':
+            kernel = threading.Thread(target=strip_single_color,
+                daemon=True)
+            kernel.start()
+        elif data.mode == 'single_color_pulse':
+            kernel = threading.Thread(target=strip_color_pulse,
+                daemon=True)
+            kernel.start()
+        elif data.mode == 'rainbow':
+            kernel = threading.Thread(target=strip_rainbow, daemon=True)
+            kernel.start()
+
+    return redirect(url_for('index'))
+
+
+@app.route('/')
+def index():
+
+    return render_template('index.html',
+        color=data.get_color_hex(),
+        brightness=int(10 * data.brightness),
+        period=1.0 / data.frequency)
+
+
+if __name__ == "__main__":
+    """
+    Execution part of script.
+    """
+
+    # Setup the script.
     strip = PixelStrip(60, 13, channel=1)
     strip.begin()
 
+    # Setup the data container.
     data = Control()
 
+    # Setup the lock object for threading.
     lock = threading.Lock()
 
-    # By default the strip is turned off.
-    last_mode = 'off'
+    # Setup the kernel.
     kernel = threading.Thread(target=strip_off, daemon=True)
     kernel.start()
 
-    while True:
-
-        # Get new state.
-        data.set_state()
-
-        if last_mode == data.mode:
-            # The mode did not change, keep the mode running. Changed options
-            # like color or frequency are handled inside the kernel.
-            pass
-        else:
-            # The mode changed, wait for the kernel to finish.
-            last_mode = data.mode
-            kernel.join()
-
-            # Start the new kernel, depending on which function is selected.
-            if data.mode == 'off':
-                kernel = threading.Thread(target=strip_off, daemon=True)
-                kernel.start()
-            elif data.mode == 'single_color':
-                kernel = threading.Thread(target=strip_single_color,
-                    daemon=True)
-                kernel.start()
-            elif data.mode == 'pulse':
-                kernel = threading.Thread(target=strip_color_pulse,
-                    daemon=True)
-                kernel.start()
-            elif data.mode == 'rainbow':
-                kernel = threading.Thread(target=strip_rainbow, daemon=True)
-                kernel.start()
+    # Run the web server.
+    app.run(host='0.0.0.0', debug=True)
