@@ -187,8 +187,8 @@ def set_mode(name):
 
 @app.route('/')
 def index():
-
     return render_template('index.html',
+        host=request.host,
         color=data.get_color_hex(),
         brightness=int(10 * data.brightness),
         period=1.0 / data.frequency)
