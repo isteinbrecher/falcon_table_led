@@ -18,7 +18,7 @@
 - Get the ip adress with `ip addr show` or alternatively use the script `find-pi.sh`.
 
 
-# Setup libraries for WS2812B
+# Setup libraries for python
 - Install `python3` virtual environment package
   ```bash
   sudo apt install python3-venv
@@ -27,11 +27,22 @@
   ```bash
   python3 -m venv <PATH TO VENV>
   ```
-- Install the python package for the led strip
+- Install the python packages
   ```bash
-  <PATH TO VENV>/bin/pip install rpi_ws281x
+  <PATH TO VENV>/bin/pip install rpi_ws281x Flask
   ```
 - Call a script that uses the python library via
   ```bash
   sudo <PATH TO VENV>/bin/python3 <PATH TO SCRIPT>
   ```
+
+# Run the server at startup
+To run the server at startup, the `run.py` script has to be added to the cronjobs.
+Edit the cronjobs with (has to be sudo, otherwise the strip can not be controlled)
+```bash
+sudo crontab -e
+```
+and add the line
+```
+@reboot <PATH TO VENV>/bin/python3 <PATH TO REPOSITORY>/led_strip/run.py
+```
