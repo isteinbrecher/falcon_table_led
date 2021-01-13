@@ -23,8 +23,8 @@ class Control(object):
         """
         Setup default values.
         """
-        self.mode = 'off'
-        self.last_mode = 'off'
+        self.mode = None
+        self.last_mode = None
         self.color = [255, 255, 255]
         self.frequency = 1.0
         self.brightness = 1.0
@@ -216,12 +216,17 @@ if __name__ == "__main__":
 
     # Setup the data container.
     data = Control()
+    data.mode = 'single_pulse'
+    data.last_mode = 'single_pulse'
+    data.frequency = 1
 
     # Setup the lock object for threading.
     lock = threading.Lock()
 
     # Setup the kernel.
-    kernel = threading.Thread(target=strip_off, daemon=True)
+    kernel = threading.Thread(target=strip_color_pulse_single, daemon=True,
+        args=[copy.deepcopy(data)],
+        kwargs={'calling_type': 'single_pulse'})
     kernel.start()
 
     # Run the web server.
