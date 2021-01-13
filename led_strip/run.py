@@ -69,36 +69,47 @@ def strip_single_color():
     strip.show()
 
 
-def strip_color_pulse():
+def strip_color_pulse_single(control_data, calling_type='single_pulse'):
     """
-    This function creates a pulse effect for a single color.
+    This function creates a single pulse effect for a single color.
     """
 
     # Number of frames for the pulse.
     n_frames = 100
+
+    for j in range(n_frames):
+
+        if not lock.locked():
+            with lock:
+                control_data = copy.deepcopy(data)
+            if not control_data.mode == calling_type:
+                return False
+
+        factor = 0.5 * (-math.cos(j / n_frames * 2 * math.pi) + 1.0)
+        color = Color(
+            int(factor * control_data.color[0]),
+            int(factor * control_data.color[1]),
+            int(factor * control_data.color[2]))
+        for i in range(strip.numPixels()):
+            strip.setPixelColor(i, color)
+        time.sleep(1.0 / control_data.frequency / n_frames)
+        strip.show()
+
+    return True
+
+
+def strip_color_pulse():
+    """
+    This function creates a endless effect for a single color.
+    """
 
     # Get the current control state.
     with lock:
         control_data = copy.deepcopy(data)
 
     while True:
-        for j in range(n_frames):
-
-            if not lock.locked():
-                with lock:
-                    control_data = copy.deepcopy(data)
-                if not control_data.mode == 'single_color_pulse':
-                    return
-
-            factor = 0.5 * (-math.cos(j / n_frames * 2 * math.pi) + 1.0)
-            color = Color(
-                int(factor * control_data.color[0]),
-                int(factor * control_data.color[1]),
-                int(factor * control_data.color[2]))
-            for i in range(strip.numPixels()):
-                strip.setPixelColor(i, color)
-            time.sleep(1.0 / control_data.frequency / n_frames)
-            strip.show()
+        if not strip_color_pulse_single(control_data, calling_type='pulse'):
+            return
 
 
 def strip_rainbow():
@@ -156,10 +167,10 @@ def set_mode(name):
         data.mode = name
 
     if data.last_mode == data.mode and kernel.is_alive():
-        # The mode did not change, keep the mode running. Changed options
-        # like color or frequency are handled inside the kernel. This branch
-        # is only executed if the thread is still running. Otherwise it will be
-        # started again.
+        # The mode did not change, keep the mode running. Changed options like
+        # color or frequency are handled inside the kernel. This branch is only
+        # executed if the thread is still running. Otherwise it will be started
+        # again.
         pass
     else:
         # The mode changed, wait for the kernel to finish.
@@ -174,7 +185,7 @@ def set_mode(name):
             kernel = threading.Thread(target=strip_single_color,
                 daemon=True)
             kernel.start()
-        elif data.mode == 'single_color_pulse':
+        elif data.mode == 'pulse':
             kernel = threading.Thread(target=strip_color_pulse,
                 daemon=True)
             kernel.start()
