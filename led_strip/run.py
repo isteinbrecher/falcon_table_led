@@ -9,9 +9,17 @@ import threading
 import time
 import copy
 from flask import Flask, request, render_template, redirect, url_for
+import os
 
-# Import LED driver.
-from rpi_ws281x import PixelStrip, Color
+if os.uname()[4][:3] == 'arm':
+    # Import LED driver.
+    from rpi_ws281x import PixelStrip, Color
+elif os.uname()[4][:3] == 'x86':
+    # Import LED driver emulator.
+    from rpi_ws281x import Color
+    from pixel_strip_emulator.pixel_strip_thread import PixelStrip
+else:
+    raise ValueError('Unknown system type')
 
 
 class Control(object):
@@ -211,7 +219,7 @@ if __name__ == "__main__":
     """
 
     # Setup the script.
-    strip = PixelStrip(60, 13, channel=1)
+    strip = PixelStrip(200, 13, channel=1)
     strip.begin()
 
     # Setup the data container.

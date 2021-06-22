@@ -29,7 +29,7 @@
   ```
 - Install the python packages
   ```bash
-  <PATH TO VENV>/bin/pip install rpi_ws281x Flask
+  <PATH TO VENV>/bin/pip install -r requirements.txt
   ```
 - Call a script that uses the python library via
   ```bash
