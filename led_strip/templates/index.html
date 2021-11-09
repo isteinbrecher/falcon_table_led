@@ -1,17 +1,20 @@
 <html>
-   <head>
-      <title>Falcon Table</title>
-      <style type="text/css">
-         body {
+
+<head>
+   <title>Falcon Table</title>
+   <style type="text/css">
+      body {
          font-family: "Courier New", sans-serif;
          font-size: 48px;
          text-align: center;
-         }
-         .centering{
+      }
+
+      .centering {
          display: flex;
          justify-content: center;
-         }
-         .button_mode {
+      }
+
+      .button_mode {
          justify-content: center;
          display: flex;
          line-height: 1;
@@ -24,42 +27,54 @@
          user-select: none;
          font-size: 24px;
          font-family: "Courier New", sans-serif;
-         }
-         .button {
+      }
+
+      .button {
          line-height: 1;
          padding: 1em;
          margin: 1em;
          border: medium solid;
          min-height: 1em;
          min-width: 1em;
-         }
-         .button {
+      }
+
+      .button {
          cursor: pointer;
          user-select: none;
-         }
-         .input-color {
+      }
+
+      .input-color {
          height: 150px;
          width: 150px;
          border: none;
-         background-color: white;
-         }
-      </style>
-   </head>
-   <body>
-      <form action="http://{{host}}/" method="post">
-         <p>Color Mode</p>
-         <div class="centering">
-            <button formaction="http://{{host}}/mode/off" method = "post" class="button_mode">Off</button>
-            <button formaction="http://{{host}}/mode/single_color" method = "post" class="button_mode">Single Color</button>
-            <button formaction="http://{{host}}/mode/pulse" method = "post" class="button_mode">Single Color Pulse</button>
-            <button formaction="http://{{host}}/mode/rainbow" method = "post" class="button_mode">Rainbow</button>
-         </div>
-         <p>Main Color</p>
-         <input type="color" name="color" class="input-color" value="{{color}}">
-         <p>Brightness</p>
-         <input type="range" min="0" max="10" name = "brightness" value="{{brightness}}">
-         <p>Period (s)</p>
-         <input name="period" value="{{period}}">
-      </form>
-   </body>
+         background-color: rgb(255, 255, 255);
+      }
+   </style>
+</head>
+
+<body>
+   <form action="http://{{host}}/" method="post">
+      <p>Color Mode</p>
+      <div class="centering">
+         <button formaction="http://{{host}}/mode/off" method="post" class="button_mode">Off</button>
+         <button formaction="http://{{host}}/mode/single_color" method="post" class="button_mode">Single Color</button>
+         <button formaction="http://{{host}}/mode/pulse" method="post" class="button_mode">Single Color Pulse</button>
+         <button formaction="http://{{host}}/mode/rainbow" method="post" class="button_mode">Rainbow</button>
+      </div>
+      <p>Main Color</p>
+      <input type="color" name="color" class="input-color" value="{{color}}" formaction="http://{{host}}/mode/off" method="post">
+      <div>
+         <input type="color" id="head" name="head" onchange="window.location.replace('http://{{host}}/mode/off');"
+                value="#e66465">
+         <label for="head">Head</label>
+
+         <div class="result"></div>
+     </div>
+      <p>Brightnesss</p>
+      <input type="range" min="0" max="10" name="brightness" value="{{brightness}}">
+      <p>Period (s)</p>
+      <input name="period" value="{{period}}">
+   </form>
+</body>
+
 </html>
