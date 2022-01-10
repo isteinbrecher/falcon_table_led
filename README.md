@@ -1,6 +1,6 @@
 # Pi setup
 
-- Download the **Raspberry Pi OS Lite** image from [here](ihttps://www.raspberrypi.org/software/operating-systems/).
+- Download the **Raspberry Pi OS Lite** image from [here](https://www.raspberrypi.org/software/operating-systems/).
 - Unzip the image and copy it to the sd card via
   ```bash
   sudo dd if=<PATH TO IMG> of=/dev/<SD CARD> status=progress bs=4M
