@@ -5,20 +5,33 @@
   ```bash
   sudo dd if=<PATH TO IMG> of=/dev/<SD CARD> status=progress bs=4M
   ```
+## Headless setup
+- To enable `ssh`, add the (empty) file `ssh` to the `boot` partition
+  ```bash
+  touch <PATH TO BOOT>/ssh
+  ```
+- Copy the template wireless file to the boot partition
+  ```bash
+  cp pi_config/wpa_supplicant.conf <PATH TO BOOT>/
+  ```
+- Set the wireless network by adding the `SSID` and password to the `wpa_supplicant.conf` file.
+- Start the pi without connecting a monitor or keyboard.
+
+## Setup with monitor
 - Start the pi and change the password (default `raspberry`) with `passwd`, be aware that the default keyboart is `UK`.
 - Enable `ssh` with (under `Interface Options / SSH`)
   ```bash
   sudo raspi-config
   ```
+- Get the ip adress with `ip addr show` or alternatively use the script `find-pi.sh`.
+
+
+# Setup libraries
 - Update packages:
   ```bash
   sudo apt update
   sudo apt upgrade
   ```
-- Get the ip adress with `ip addr show` or alternatively use the script `find-pi.sh`.
-
-
-# Setup libraries for python
 - Install `python3` virtual environment package
   ```bash
   sudo apt install python3-venv
