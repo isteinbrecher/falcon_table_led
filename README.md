@@ -26,12 +26,16 @@
 - Get the ip adress with `ip addr show` or alternatively use the script `find-pi.sh`.
 
 
-# Setup libraries
+## Setup OS
 - Update packages:
   ```bash
   sudo apt update
   sudo apt upgrade
   ```
+- Add the public ssh key to `.ssh/authorized_keys`.
+
+# Setup python libraries
+
 - Install `python3` virtual environment package
   ```bash
   sudo apt install python3-venv
