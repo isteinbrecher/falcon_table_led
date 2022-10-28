@@ -1,23 +1,10 @@
 # Pi setup
+- Download the **Raspberry Pi Imager** from [here](https://www.raspberrypi.com/software/)
 
-- Download the **Raspberry Pi OS Lite** image from [here](https://www.raspberrypi.org/software/operating-systems/).
-- Unzip the image and copy it to the sd card via
-  ```bash
-  sudo dd if=<PATH TO IMG> of=/dev/<SD CARD> status=progress bs=4M
-  ```
 ## Headless setup
-- To enable `ssh`, add the (empty) file `ssh` to the `boot` partition
-  ```bash
-  touch <PATH TO BOOT>/ssh
-  ```
-- Copy the template wireless file to the boot partition
-  ```bash
-  cp pi_config/wpa_supplicant.conf <PATH TO BOOT>/
-  ```
-- Set the wireless network by adding the `SSID` and password to the `wpa_supplicant.conf` file.
-- Start the pi without connecting a monitor or keyboard.
+- For headless setup set the necessary WIFI and ssh options before writing the image to the flash drive
 
-## Setup with monitor
+## Setup with a monitor
 - Start the pi and change the password (default `raspberry`) with `passwd`, be aware that the default keyboart is `UK`.
 - Enable `ssh` with (under `Interface Options / SSH`)
   ```bash
