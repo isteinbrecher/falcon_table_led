@@ -9,9 +9,11 @@ LedStrip led_strip(led_strip_num_pixels, pin_strip);
 
 
 // Global data that is exchanged via IO
+// The volatile keyword is essential here, to prohibit the compiler from making assumptions that
+// will result in endless loops
 constexpr size_t n_data = 6;
-uint8_t global_data[n_data] = {0, 0, 0, 0, 0, 0};
-bool global_data_updated = true;
+volatile uint8_t global_data[n_data] = {0, 0, 0, 0, 0, 0};
+volatile bool global_data_updated = true;
 
 // Get the active mode
 inline uint8_t get_global_mode() { return global_data[3]; }
@@ -56,9 +58,9 @@ void strip_off()
         led_strip.SetPixelColor(i, RgbColor{0, 0, 0});
       }
       led_strip.Show();
+
+      global_data_updated = false;
     }
-    // This delay is required, so the global variable global_data_updated gets synced
-    delay(default_delay);
   }
 }
 
@@ -84,8 +86,6 @@ void constant_color_mode()
 
       global_data_updated = false;
     }
-    // This delay is required, so the global variable global_data_updated gets synced
-    delay(default_delay);
   }
 }
 
