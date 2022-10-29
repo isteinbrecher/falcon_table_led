@@ -41,7 +41,7 @@ print(checksum)
 # assert crc_calculator.verify_checksum(data, expected_checksum)
 
 
-rgb_color = bytes([20, 20, 200, 2, 100, 0])
+rgb_color = bytes([255, 0, 0, 4, 150, 0])
 crc_calculator = CrcCalculator(Crc8.CCITT)
 checksum = crc_calculator.calculate_checksum(rgb_color)
 
@@ -55,3 +55,7 @@ with smbus2.SMBus(1) as i2c_bus:
     send_data(i2c_bus, rgb_color)
     data = read_data(i2c_bus, len(rgb_color))
     print(data)
+
+
+# Colors
+# gold = 255, 100, 0

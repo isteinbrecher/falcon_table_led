@@ -165,10 +165,12 @@ void stars()
 {
   const uint8_t my_mode = get_global_mode();
 
-  uint8_t pixel_values[led_strip_num_pixels];
+  RgbColor pixel_colors[led_strip_num_pixels];
+  uint8_t blend_factor[led_strip_num_pixels];
   for (unsigned int i = 0; i < led_strip_num_pixels; i++)
   {
-    pixel_values[i] = 0;
+    pixel_colors[i] = RgbColor{0, 0, 0};
+    blend_factor[i] = 0;
   }
 
   const double fade_rate = 0.3;
@@ -191,7 +193,7 @@ void stars()
     {
       for (unsigned int i = 0; i < led_strip_num_pixels; i++)
       {
-        if (pixel_values[i] > 0) pixel_values[i] -= 1;
+        if (blend_factor[i] > 0) blend_factor[i] -= 1;
       }
       last_fade = time_now - ((time_now - last_fade) % fade_interval);
       update = true;
@@ -202,7 +204,8 @@ void stars()
     {
       // Get random led
       const int new_led = random(0, led_strip_num_pixels);
-      pixel_values[new_led] = 255;
+      pixel_colors[new_led] = get_global_color();
+      blend_factor[new_led] = 255;
       last_spawn = time_now - ((time_now - last_spawn) % spawn_interval);
       update = true;
     }
@@ -212,7 +215,7 @@ void stars()
     {
       for (unsigned int i = 0; i < led_strip_num_pixels; i++)
       {
-        led_strip.SetPixelColor(i, RgbColor(pixel_values[i], pixel_values[i], pixel_values[i]));
+        led_strip.SetPixelColor(i, pixel_colors[i].Dim(blend_factor[i]));
       }
       led_strip.Show();
     }
