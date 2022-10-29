@@ -61,6 +61,7 @@ void receiveEvents(size_t n_bytes)
     {
       for (size_t i_data = 0; i_data < n_data; i_data++) global_data[i_data] = local_data[i_data];
       global_data_updated = true;
+      post_update();
     }
 
     // Todo: Make better debug output

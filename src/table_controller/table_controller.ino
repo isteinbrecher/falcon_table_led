@@ -13,10 +13,6 @@ constexpr size_t n_data = 6;
 uint8_t global_data[n_data] = {0, 0, 0, 0, 0, 0};
 bool global_data_updated = true;
 
-// This include has to be defined after the data variables are initialized
-#include "io.h"
-
-
 // Get the active mode
 inline uint8_t get_global_mode() { return global_data[3]; }
 
@@ -28,6 +24,12 @@ inline uint8_t get_global_delay() { return global_data[5]; }
 
 // Get the global color value
 inline RgbColor get_global_color() { return {global_data[0], global_data[1], global_data[2]}; }
+
+// Do post update stuff
+void post_update() { led_strip.SetBrightness(get_global_brightness()); }
+
+// This include has to be defined after the data variables are initialized
+#include "io.h"
 
 
 // Other global variables
@@ -73,8 +75,7 @@ void constant_color_mode()
     {
       if (my_mode != get_global_mode()) return;
 
-      // The strip has to be redrawn, also set the brightness since that could have also changed
-      led_strip.SetBrightness(get_global_brightness());
+      // The strip has to be redrawn
       for (size_t i = 0; i < led_strip_num_pixels; i++)
       {
         led_strip.SetPixelColor(i, get_global_color());
@@ -137,6 +138,72 @@ RgbColor Wheel(uint8_t i_pos)
 }
 
 
+// starts (inspired by PicoLed)
+void stars()
+{
+  const uint8_t my_mode = get_global_mode();
+
+  uint8_t pixel_values[led_strip_num_pixels];
+  for (unsigned int i = 0; i < led_strip_num_pixels; i++)
+  {
+    pixel_values[i] = 0;
+  }
+
+  const double fade_rate = 0.3;
+  const double spawn_rate_per_10_pixel = 0.5;
+
+  const uint32_t fade_interval = max(1, 1000.0 / 255.0 / fade_rate);
+  const uint32_t spawn_interval =
+      max(1, 1000.0 / spawn_rate_per_10_pixel * 10.0 / led_strip_num_pixels);
+
+  unsigned long last_fade = 0;
+  unsigned long last_spawn = 0;
+
+  while (true)
+  {
+    bool update = false;
+    unsigned long time_now = millis();
+
+    // Check if fade happens
+    if ((time_now - last_fade) > fade_interval)
+    {
+      for (unsigned int i = 0; i < led_strip_num_pixels; i++)
+      {
+        if (pixel_values[i] > 0) pixel_values[i] -= 1;
+      }
+      last_fade = time_now - ((time_now - last_fade) % fade_interval);
+      update = true;
+    }
+
+    // Check if new light appears
+    if ((time_now - last_spawn) > spawn_interval)
+    {
+      // Get random led
+      const int new_led = random(0, led_strip_num_pixels);
+      pixel_values[new_led] = 255;
+      last_spawn = time_now - ((time_now - last_spawn) % spawn_interval);
+      update = true;
+    }
+
+    // Display the existing pixels
+    if (update)
+    {
+      for (unsigned int i = 0; i < led_strip_num_pixels; i++)
+      {
+        led_strip.SetPixelColor(i, RgbColor(pixel_values[i], pixel_values[i], pixel_values[i]));
+      }
+      led_strip.Show();
+    }
+
+    // Check if the mode has been changed
+    if (my_mode != get_global_mode())
+    {
+      return;
+    }
+  }
+}
+
+
 /**
  * \brief Setup and initialise variables
  */
@@ -175,6 +242,11 @@ void loop()
     case 2:
     {
       rainbow_cycle();
+      break;
+    }
+    case 3:
+    {
+      stars();
       break;
     }
   }
