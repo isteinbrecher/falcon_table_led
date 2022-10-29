@@ -28,7 +28,7 @@ inline RgbColor get_global_color() { return {global_data[0], global_data[1], glo
 
 
 // Other global variables
-constexpr int min_delay = 10;
+constexpr int default_delay = 10;
 
 /**
  * \brief Turn of the strip
@@ -36,13 +36,24 @@ constexpr int min_delay = 10;
 void strip_off()
 {
   const uint8_t my_mode = get_global_mode();
+  Serial.print("my mode: ");
+  Serial.print(my_mode);
+  Serial.print("\n");
 
   while (true)
   {
     if (global_data_updated)
     {
       if (my_mode != get_global_mode()) return;
+
+      for (size_t i = 0; i < led_strip.PixelCount(); i++)
+      {
+        led_strip.SetPixelColor(i, RgbColor{0, 0, 0});
+      }
+      led_strip.Show();
     }
+    // This delay is required, so the global variable global_data_updated gets synced
+    delay(default_delay);
   }
 }
 
@@ -69,6 +80,8 @@ void constant_color_mode()
 
       global_data_updated = false;
     }
+    // This delay is required, so the global variable global_data_updated gets synced
+    delay(default_delay);
   }
 }
 
