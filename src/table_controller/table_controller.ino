@@ -10,7 +10,7 @@ LedStrip led_strip(led_strip_num_pixels, pin_strip);
 
 // Global data that is exchanged via IO
 constexpr size_t n_data = 5;
-uint8_t global_data[n_data] = {};
+uint8_t global_data[n_data] = {0, 0, 0, 0, 0};
 bool global_data_updated = true;
 
 // This include has to be defined after the data variables are initialized
@@ -31,6 +31,22 @@ inline RgbColor get_global_color() { return {global_data[0], global_data[1], glo
 constexpr int min_delay = 10;
 
 /**
+ * \brief Turn of the strip
+ */
+void strip_off()
+{
+  const uint8_t my_mode = get_global_mode();
+
+  while (true)
+  {
+    if (global_data_updated)
+    {
+      if (my_mode != get_global_mode()) return;
+    }
+  }
+}
+
+/**
  * \brief Display the strip with a constant color
  */
 void constant_color_mode()
@@ -47,7 +63,7 @@ void constant_color_mode()
       led_strip.SetBrightness(get_global_brightness());
       for (size_t i = 0; i < led_strip.PixelCount(); i++)
       {
-        set_pixel_color(i, get_global_color());
+        led_strip.SetPixelColor(i, get_global_color());
       }
       led_strip.Show();
 
@@ -79,56 +95,16 @@ void setup()
  */
 void loop()
 {
-  // for (unsigned int i = 0; i < led_strip_num_pixels; i++)
-  // {
-  //   led_strip.SetPixelColor(i, get_global_color());
-  // }
-  // led_strip.Show();
-
-  // delay(0);
-
-
-
   switch (get_global_mode())
   {
     case 0:
     {
-      rainbow_cycle();
+      strip_off();
       break;
     }
     case 1:
     {
-      rainbow_const();
-      break;
-    }
-    case 2:
-    {
-      rainbow();
-      break;
-    }
-    case 3:
-    {
       constant_color_mode();
-      break;
-    }
-    case 4:
-    {
-      constant_color_mode(RgbColor(255, 255, 255));
-      break;
-    }
-    case 5:
-    {
-      constant_color_mode(RgbColor(255, 0, 120));
-      break;
-    }
-    case 6:
-    {
-      constant_color_mode(RgbColor(0, 0, 255));
-      break;
-    }
-    case 7:
-    {
-      stars();
       break;
     }
   }
