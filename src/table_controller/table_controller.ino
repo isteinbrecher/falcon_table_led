@@ -138,6 +138,28 @@ RgbColor Wheel(uint8_t i_pos)
 }
 
 
+void rainbow_const()
+{
+  unsigned int my_mode = get_global_mode();
+
+  while (true)
+  {
+    for (uint8_t j = 0; j < 256; j++)
+    {
+      for (uint16_t i = 0; i < led_strip_num_pixels; i++)
+      {
+        led_strip.SetPixelColor(i, Wheel(j));
+      }
+      led_strip.Show();
+
+      delay(get_global_delay());
+
+      if (my_mode != get_global_mode()) return;
+    }
+  }
+}
+
+
 // starts (inspired by PicoLed)
 void stars()
 {
@@ -245,6 +267,11 @@ void loop()
       break;
     }
     case 3:
+    {
+      rainbow_const();
+      break;
+    }
+    case 4:
     {
       stars();
       break;
