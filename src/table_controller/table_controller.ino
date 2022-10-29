@@ -11,8 +11,8 @@ LedStrip led_strip(led_strip_num_pixels, pin_strip);
 // Global data that is exchanged via IO
 // The volatile keyword is essential here, to prohibit the compiler from making assumptions that
 // will result in endless loops
-constexpr size_t n_data = 6;
-volatile uint8_t global_data[n_data] = {0, 0, 0, 0, 0, 0};
+constexpr size_t n_data = 7;
+volatile uint8_t global_data[n_data] = {0, 0, 0, 0, 0, 0, 0};
 volatile bool global_data_updated = true;
 
 // Get the active mode
@@ -26,6 +26,8 @@ inline uint8_t get_global_delay() { return global_data[5]; }
 
 // Get the global color value
 inline RgbColor get_global_color() { return {global_data[0], global_data[1], global_data[2]}; }
+
+inline uint8_t get_global_flag(size_t i) { return global_data[6 + i]; }
 
 // Do post update stuff
 void post_update() { led_strip.SetBrightness(get_global_brightness()); }
@@ -164,6 +166,7 @@ void rainbow_const()
 void stars()
 {
   const uint8_t my_mode = get_global_mode();
+  bool is_random = get_global_flag(0) != 0;
 
   RgbColor pixel_colors[led_strip_num_pixels];
   uint8_t blend_factor[led_strip_num_pixels];
@@ -204,8 +207,11 @@ void stars()
     {
       // Get random led
       const int new_led = random(0, led_strip_num_pixels);
-      pixel_colors[new_led] = get_global_color();
       blend_factor[new_led] = 255;
+      if (is_random)
+        pixel_colors[new_led] = Wheel(random(0, 256));
+      else
+        pixel_colors[new_led] = get_global_color();
       last_spawn = time_now - ((time_now - last_spawn) % spawn_interval);
       update = true;
     }
@@ -224,6 +230,10 @@ void stars()
     if (my_mode != get_global_mode())
     {
       return;
+    }
+    else
+    {
+      is_random = get_global_flag(0) != 0;
     }
   }
 }

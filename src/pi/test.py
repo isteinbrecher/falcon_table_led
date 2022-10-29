@@ -31,17 +31,7 @@ def read_data(i2c_bus, data_size):
         return None, False
 
 
-data = bytes([1, 23, 8, 254, 0, 124])
-
-crc_calculator = CrcCalculator(Crc8.CCITT)
-
-checksum = crc_calculator.calculate_checksum(data)
-print(checksum)
-# assert checksum == expected_checksum
-# assert crc_calculator.verify_checksum(data, expected_checksum)
-
-
-rgb_color = bytes([255, 0, 0, 4, 150, 0])
+rgb_color = bytes([200, 200, 200, 4, 255, 0, 0])
 crc_calculator = CrcCalculator(Crc8.CCITT)
 checksum = crc_calculator.calculate_checksum(rgb_color)
 
