@@ -28,6 +28,7 @@ LedStrip led_strip(led_strip_num_pixels, pin_strip);
 void setup()
 {
   Wire.begin(I2C_SLAVE_ADDRESS);
+  Wire.onRequest(requestEvents);
   Wire.onReceive(receiveEvents);
 
   Serial.begin(9600);

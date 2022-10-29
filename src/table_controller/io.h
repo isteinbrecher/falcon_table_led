@@ -6,6 +6,24 @@
 #include <CRC8.h>
 
 
+/**
+ * \brief This function is called when a message is requested
+ */
+void requestEvents()
+{
+  // Calculate the checksum, this is the first value we send
+  CRC8 crc;
+  for (size_t i_data = 0; i_data < n_data; i_data++) crc.add(global_data[i_data]);
+  Wire.write(crc.getCRC());
+
+  // Send the data
+  for (size_t i_data = 0; i_data < n_data; i_data++) Wire.write(global_data[i_data]);
+}
+
+
+/**
+ * \brief This function is called when a message is received
+ */
 void receiveEvents(int n_bytes)
 {
   if (n_bytes != n_data + 1)
@@ -43,7 +61,6 @@ void receiveEvents(int n_bytes)
       Serial.print("Checksum ok");
     else
       Serial.print("Checksum WRONG");
-
     if (Wire.available()) Serial.print("Error, more bytes available");
   }
 }
