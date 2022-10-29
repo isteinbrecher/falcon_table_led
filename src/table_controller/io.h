@@ -6,6 +6,10 @@
 #include <CRC8.h>
 
 
+// Address of this slave device
+#define I2C_SLAVE_ADDRESS 11
+
+
 /**
  * \brief This function is called when a message is requested
  */
@@ -24,7 +28,7 @@ void requestEvents()
 /**
  * \brief This function is called when a message is received
  */
-void receiveEvents(int n_bytes)
+void receiveEvents(size_t n_bytes)
 {
   if (n_bytes != n_data + 1)
   {
@@ -38,10 +42,10 @@ void receiveEvents(int n_bytes)
   else
   {
     // The first byte is the checksum
-    const uint32_t checksum = Wire.read();
+    const uint8_t checksum = Wire.read();
 
     // Get the submitted bytes values
-    uint32_t local_data[n_data];
+    uint8_t local_data[n_data];
     CRC8 crc;
     for (size_t i_data = 0; i_data < n_data; i_data++)
     {
@@ -54,7 +58,10 @@ void receiveEvents(int n_bytes)
 
     // If everything is ok, change the global data
     if (is_crc_ok)
+    {
       for (size_t i_data = 0; i_data < n_data; i_data++) global_data[i_data] = local_data[i_data];
+      global_data_updated = true;
+    }
 
     // Todo: Make better debug output
     if (is_crc_ok)
