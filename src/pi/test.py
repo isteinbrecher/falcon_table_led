@@ -9,7 +9,7 @@ print(checksum)
 # assert crc_calculator.verify_checksum(data, expected_checksum)
 
 
-rgb_color = bytes([0, 40, 60])
+rgb_color = bytes([40, 20, 0])
 crc_calculator = CrcCalculator(Crc8.CCITT)
 checksum = crc_calculator.calculate_checksum(rgb_color)
 
