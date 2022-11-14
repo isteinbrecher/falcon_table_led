@@ -1,0 +1,4 @@
+{
+    "clang-format.executable": "/home/ivo/workspace/baci/work/source/utilities/baci-python-venv/bin/clang-format",
+    "editor.formatOnSave": true
+}
