@@ -1,3 +1,6 @@
 [submodule "pico/modules/pico-onewire"]
 	path = pico/modules/pico-onewire
 	url = git@github.com:adamboardman/pico-onewire.git
+[submodule "pico/modules/PicoLED"]
+	path = pico/modules/PicoLED
+	url = https://github.com/ForsakenNGS/PicoLED.git
