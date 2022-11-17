@@ -13,6 +13,8 @@ endif()
 
 set(FACLON_TABLE_LED_PATH ${PROJECT_SOURCE_DIR})
 
+set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+
 # Initialize the SDK
 pico_sdk_init()
 
@@ -20,6 +22,10 @@ pico_sdk_init()
 
 
 add_subdirectory(modules/pico-onewire)
+
+
+add_subdirectory(modules/PicoLED)
+
 
 
 
@@ -30,7 +36,7 @@ if (TARGET tinyusb_device)
             )
 
     # pull in common dependencies
-    target_link_libraries(falcon_table_led pico_stdlib pico_one_wire)
+    target_link_libraries(falcon_table_led pico_stdlib pico_one_wire PicoLed)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(falcon_table_led 1)
