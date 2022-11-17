@@ -26,6 +26,8 @@ add_subdirectory(modules/pico-onewire)
 
 add_subdirectory(modules/PicoLED)
 
+add_subdirectory(src/led_strip)
+
 
 
 
@@ -36,7 +38,7 @@ if (TARGET tinyusb_device)
             )
 
     # pull in common dependencies
-    target_link_libraries(falcon_table_led pico_stdlib pico_one_wire PicoLed)
+    target_link_libraries(falcon_table_led pico_stdlib pico_one_wire PicoLed led_strip)
 
     # enable usb output, disable uart output
     pico_enable_stdio_usb(falcon_table_led 1)

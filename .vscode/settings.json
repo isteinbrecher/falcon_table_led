@@ -1,0 +1,11 @@
+{
+    "clang-format.executable": "/home/ivo/workspace/baci/work/source/utilities/baci-python-venv/bin/clang-format",
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "streambuf": "cpp",
+        "atomic": "cpp",
+        "cstdint": "cpp",
+        "random": "cpp",
+        "*.tcc": "cpp"
+    },
+}
